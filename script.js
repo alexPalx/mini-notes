@@ -1,3 +1,7 @@
+//TODO: refactor it
+//TODO: tab name change function
+//TODO: improved and responsive design
+
 const editButtons = document.querySelectorAll('.button_edit');
 const deleteButtons = document.querySelectorAll('.button_delete');
 const copyButtons = document.querySelectorAll('.button_copy');
@@ -58,8 +62,8 @@ function removeItem(node) {
 
 function updateClipboard(text) {
     navigator.clipboard.writeText(text)
-        .then(() => console.log(`"${text}" copied!`),
-            (err) => console.log(`Error: ${err}`));
+        .then(() => showPopup('Copied to clipboard!'),
+            (err) => showPopup('Error copying to clipboard.'));
 }
 
 function switchEditSave(content, button) {
@@ -140,7 +144,7 @@ function erase() {
 
 function loadData(data) {
     if (!Array.isArray(data[0])) {
-        console.log('Invalid data');
+        showPopup('Invalid import data.');
         return;
     }
     
@@ -190,16 +194,24 @@ function dataImport() {
         setActiveTab(document.querySelector('.tab'));
     }
     catch {
-        console.log('Invalid data');
+        showPopup('Invalid import data.');
         return;
     }
 
-    console.log('Successfully imported');
+    showPopup('Successfully imported!');
     saveToLocalStorage();
 }
 
 function init() {
     loadFromLocalStorage();
+}
+
+function showPopup(text) {
+    const popup = document.createElement('div');
+    popup.className = 'popup';
+    popup.textContent = text;
+    popup.addEventListener('animationend', () => popup.remove());
+    document.body.append(popup);
 }
 
 init();
