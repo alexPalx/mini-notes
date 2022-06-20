@@ -10,9 +10,10 @@ copyButtons.forEach(button => button.addEventListener('click', event => updateCl
 createButtons.forEach(button => button.addEventListener('click', event => addItem(event.target.parentNode.parentNode)));
 tabButtons.forEach(button => button.addEventListener('click', event => setActiveTab(event.target)));
 
-function addItem(listNode) {
+function addItem(listNode, content) {
     const itemId = listNode.children.length - 1;
-    const itemText = listNode.children[itemId].children[0].textContent;
+    const itemText = content ? content : listNode.children[itemId].children[0].textContent;
+    if (itemText === '') return;
 
     const template = `
     <div class="item__text" contentEditable="false">${itemText}</div>
@@ -33,6 +34,8 @@ function addItem(listNode) {
 
     listNode.children[itemId].children[0].textContent = '';
     listNode.insertBefore(newElem, listNode.children[itemId]);
+
+    saveToLocalStorage();
 }
 
 function removeItem(node) {
@@ -45,6 +48,8 @@ function removeItem(node) {
         list.children[i].classList.remove(classListArray.find(className => className.startsWith('#')));
         list.children[i].classList.add(`#${i}`);
     }
+
+    saveToLocalStorage();
 }
 
 function updateClipboard(text) {
@@ -55,14 +60,21 @@ function updateClipboard(text) {
 
 function switchEditSave(content, button) {
     content.contentEditable = !JSON.parse(content.contentEditable);
-    button.textContent = JSON.parse(content.contentEditable) ? 'Save' : 'Edit';
+
+    if (JSON.parse(content.contentEditable)) {
+        button.textContent = 'Save';
+    }
+    else {
+        button.textContent = 'Edit';
+        saveToLocalStorage();
+    }
 }
 
 function setActiveTab(tabNode) {
     const allListsParent = document.querySelector('.content-wrapper');
 
     if (tabNode.textContent === ' + ') {
-        addTab(tabNode, allListsParent);
+        addTab();
         return;
     }
 
@@ -75,7 +87,9 @@ function setActiveTab(tabNode) {
     allListsParent.children[activeTabId].classList.add('content_active');
 }
 
-function addTab(tabNode, allListsParent) {
+function addTab() {
+    const tabNode = document.querySelector('.tab_create');
+    const allListsParent = document.querySelector('.content-wrapper');
     const tabs = tabNode.parentNode;
     const newTabId = tabs.children.length;
 
@@ -98,3 +112,38 @@ function addTab(tabNode, allListsParent) {
 
     allListsParent.appendChild(newContent);
 }
+
+function saveToLocalStorage() {
+    // save as [ lists[ list_items(text) ] ] ]
+    const data = Array.from(document.querySelectorAll('.content'))
+        .map(item => Array.from(item.children)
+            .map(elem => elem.children[0].textContent)
+            .filter(elem => elem !== ''));
+
+    localStorage.setItem('mini-notes-data', JSON.stringify(data));
+}
+
+function loadFromLocalStorage() {
+    let data = JSON.parse(localStorage.getItem('mini-notes-data'));
+    if (!data) {
+        localStorage.setItem('mini-notes-data', JSON.stringify([[["Simple text"]]]));
+        data = JSON.parse(localStorage.getItem('mini-notes-data'));
+    };
+
+    for (let list = 0; list < data.length; ++list) {
+        addTab();
+        for (let item = 0; item < data[list].length; ++item) {
+            const lists = document.querySelectorAll('.content');
+            const listNode = lists[lists.length - 1];
+            addItem(listNode, data[list][item]);
+        }
+    }
+
+    setActiveTab(document.querySelector('.tab'));
+}
+
+function init() {
+    loadFromLocalStorage();
+}
+
+init();
