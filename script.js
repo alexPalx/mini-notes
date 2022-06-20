@@ -34,7 +34,15 @@ function addItem(listNode) {
 }
 
 function removeItem(node) {
+    const list = node.parentNode;
     node.remove();
+
+    // update indexes
+    for (let i = 0; i < list.children.length - 1; ++i) {
+        const classListArray = Array.from(list.children[i].classList);
+        list.children[i].classList.remove(classListArray.find(className => className.startsWith('#')));
+        list.children[i].classList.add(`#${i}`);
+    }
 }
 
 function updateClipboard(text) {
