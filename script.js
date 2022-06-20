@@ -59,12 +59,42 @@ function switchEditSave(content, button) {
 }
 
 function setActiveTab(tabNode) {
+    const allListsParent = document.querySelector('.content-wrapper');
+
+    if (tabNode.textContent === ' + ') {
+        addTab(tabNode, allListsParent);
+        return;
+    }
+
     const activeTabId = +Array.from(tabNode.classList).find(className => className.startsWith('#')).slice(1) || 0;
 
-    tabButtons.forEach(button => button.classList.remove('tab_active'));
+    document.querySelectorAll('.tab').forEach(button => button.classList.remove('tab_active'));
     tabNode.classList.add('tab_active');
 
-    const allListsParent = document.querySelector('.content-wrapper');
     [].forEach.call(allListsParent.children, list => list.classList.remove('content_active'));
     allListsParent.children[activeTabId].classList.add('content_active');
+}
+
+function addTab(tabNode, allListsParent) {
+    const tabs = tabNode.parentNode;
+    const newTabId = tabs.children.length;
+
+    const newTab = document.createElement('li');
+    newTab.classList.add('tab', `#${newTabId - 1}`);
+    newTab.textContent = `Tab ${newTabId}`;
+    tabs.insertBefore(newTab, tabNode);
+
+    newTab.addEventListener('click', event => setActiveTab(event.target));
+
+    const newContent = document.createElement('ul');
+    newContent.classList.add('content', `#${newTabId}`);
+    newContent.innerHTML = `
+    <li class="content__item item item_create">
+        <div class="item__text" contentEditable="true"></div>
+        <button class="button button_create">Add</button>
+    </li>`;
+    // listener for add button
+    newContent.children[0].children[1].addEventListener('click', event => addItem(event.target.parentNode.parentNode));
+
+    allListsParent.appendChild(newContent);
 }
