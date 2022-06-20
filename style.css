@@ -68,14 +68,24 @@
     width: 100%;
 }
 
+.import-export__text-input:focus,
+.item__text:focus {
+    outline: 1px dashed #777777;
+}
+
 .item__buttons {
-    margin: 0 5px;
+    margin-left: 10px;
     min-width: 130px;
 }
 
 .button {
     width: 40px;
     height: 40px;
+}
+
+.button_create {
+    margin-left: 10px;
+    min-width: 40px;
 }
 
 .import-export {
@@ -94,3 +104,4 @@
     font-size: 12px;
     color: #bbbbbb;
 }
+

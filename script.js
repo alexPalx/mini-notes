@@ -66,6 +66,17 @@ function switchEditSave(content, button) {
     content.contentEditable = !JSON.parse(content.contentEditable);
 
     if (JSON.parse(content.contentEditable)) {
+        content.focus();
+
+        const range = document.createRange();
+        const selection = window.getSelection();
+
+        range.setStart(content, 1);
+        range.collapse(true);
+
+        selection.removeAllRanges();
+        selection.addRange(range);
+
         button.textContent = 'Save';
     }
     else {
@@ -115,6 +126,8 @@ function addTab() {
     newContent.children[0].children[1].addEventListener('click', event => addItem(event.target.parentNode.parentNode));
 
     allListsParent.appendChild(newContent);
+
+    setActiveTab(tabs.children[newTabId - 1]);
 }
 
 function erase() {
