@@ -127,20 +127,20 @@
 @keyframes popupAnimation {
     0% {
         bottom: -50px;
-        left: calc(50% - 50px);
+        left: 50px;
     }
     30% {
         bottom: 50px;
-        left: calc(50% - 50px);
+        left: 50px;
     }
     80% {
         bottom: 50px;
-        left: calc(50% - 50px);
+        left: 50px;
         opacity: 1;
     }
     100% {
         bottom: 50px;
-        left: calc(50% - 50px);
+        left: 50px;
         opacity: 0;
     }
 }
