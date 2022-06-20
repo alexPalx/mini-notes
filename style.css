@@ -59,13 +59,38 @@
     display: flex;
     justify-content: space-between;
     padding: 10px;
-    border: 1px solid black;
+    border: 1px solid #777777;
 
     list-style-type: none;
 }
 
 .item__text {
-    width: 80%;
+    width: 100%;
 }
 
-/* .item__buttons {} */
+.item__buttons {
+    margin: 0 5px;
+    min-width: 130px;
+}
+
+.button {
+    width: 40px;
+    height: 40px;
+}
+
+.import-export {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 30px 0;
+}
+
+.import-export__buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.import-export__help-text {
+    font-size: 12px;
+    color: #bbbbbb;
+}

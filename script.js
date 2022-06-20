@@ -3,12 +3,16 @@ const deleteButtons = document.querySelectorAll('.button_delete');
 const copyButtons = document.querySelectorAll('.button_copy');
 const createButtons = document.querySelectorAll('.button_create');
 const tabButtons = document.querySelectorAll('.tab');
+const importButton = document.querySelector('.button_import');
+const exportButton = document.querySelector('.button_export');
 
 editButtons.forEach(button => button.addEventListener('click', event => switchEditSave(event.target.parentNode.parentNode.children[0], event.target)));
 deleteButtons.forEach(button => button.addEventListener('click', event => removeItem(event.target.parentNode.parentNode)));
 copyButtons.forEach(button => button.addEventListener('click', event => updateClipboard(event.target.parentNode.parentNode.children[0].textContent)));
 createButtons.forEach(button => button.addEventListener('click', event => addItem(event.target.parentNode.parentNode)));
 tabButtons.forEach(button => button.addEventListener('click', event => setActiveTab(event.target)));
+importButton.addEventListener('click', dataImport);
+exportButton.addEventListener('click', dataExport);
 
 function addItem(listNode, content) {
     const itemId = listNode.children.length - 1;
@@ -55,7 +59,7 @@ function removeItem(node) {
 function updateClipboard(text) {
     navigator.clipboard.writeText(text)
         .then(() => console.log(`"${text}" copied!`),
-            () => console.log('Error'));
+            (err) => console.log(`Error: ${err}`));
 }
 
 function switchEditSave(content, button) {
@@ -113,6 +117,36 @@ function addTab() {
     allListsParent.appendChild(newContent);
 }
 
+function erase() {
+    const tabs = document.querySelectorAll('.tab');
+    const lists = document.querySelectorAll('.content');
+
+    for (let i = 0; i < tabs.length - 1; ++i) tabs[i].remove()
+    lists.forEach(list => list.remove());
+}
+
+function loadData(data) {
+    if (!Array.isArray(data[0])) {
+        console.log('Invalid data');
+        return;
+    }
+    
+    erase();
+
+    for (let list = 0; list < data.length; ++list) {
+        addTab();
+        for (let item = 0; item < data[list].length; ++item) {
+            const lists = document.querySelectorAll('.content');
+            const listNode = lists[lists.length - 1];
+            addItem(listNode, data[list][item]);
+        }
+    }
+
+    setActiveTab(document.querySelector('.tab'));
+
+    return data;
+}
+
 function saveToLocalStorage() {
     // save as [ lists[ list_items(text) ] ] ]
     const data = Array.from(document.querySelectorAll('.content'))
@@ -126,20 +160,29 @@ function saveToLocalStorage() {
 function loadFromLocalStorage() {
     let data = JSON.parse(localStorage.getItem('mini-notes-data'));
     if (!data) {
-        localStorage.setItem('mini-notes-data', JSON.stringify([[["Simple text"]]]));
+        localStorage.setItem('mini-notes-data', JSON.stringify([[["Note example"]]]));
         data = JSON.parse(localStorage.getItem('mini-notes-data'));
     };
 
-    for (let list = 0; list < data.length; ++list) {
-        addTab();
-        for (let item = 0; item < data[list].length; ++item) {
-            const lists = document.querySelectorAll('.content');
-            const listNode = lists[lists.length - 1];
-            addItem(listNode, data[list][item]);
-        }
+    return loadData(data);
+}
+
+function dataExport() {
+    updateClipboard(JSON.stringify(loadFromLocalStorage()));
+}
+
+function dataImport() {
+    try {
+        loadData(JSON.parse(document.querySelector('#import').value));
+        setActiveTab(document.querySelector('.tab'));
+    }
+    catch {
+        console.log('Invalid data');
+        return;
     }
 
-    setActiveTab(document.querySelector('.tab'));
+    console.log('Successfully imported');
+    saveToLocalStorage();
 }
 
 function init() {
