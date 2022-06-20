@@ -32,6 +32,8 @@
     padding: 3px;
     border: 1px solid #dddddd;
     border-bottom: none;
+
+    cursor: pointer;
 }
 
 .tab_active {
@@ -44,6 +46,10 @@
 }
 
 .content {
+    display: none;
+}
+
+.content_active {
     display: flex;
     flex-direction: column;
     gap: 10px;

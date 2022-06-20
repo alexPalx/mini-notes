@@ -2,11 +2,13 @@ const editButtons = document.querySelectorAll('.button_edit');
 const deleteButtons = document.querySelectorAll('.button_delete');
 const copyButtons = document.querySelectorAll('.button_copy');
 const createButtons = document.querySelectorAll('.button_create');
+const tabButtons = document.querySelectorAll('.tab');
 
 editButtons.forEach(button => button.addEventListener('click', event => switchEditSave(event.target.parentNode.parentNode.children[0], event.target)));
 deleteButtons.forEach(button => button.addEventListener('click', event => removeItem(event.target.parentNode.parentNode)));
 copyButtons.forEach(button => button.addEventListener('click', event => updateClipboard(event.target.parentNode.parentNode.children[0].textContent)));
 createButtons.forEach(button => button.addEventListener('click', event => addItem(event.target.parentNode.parentNode)));
+tabButtons.forEach(button => button.addEventListener('click', event => setActiveTab(event.target)));
 
 function addItem(listNode) {
     const itemId = listNode.children.length - 1;
@@ -54,4 +56,15 @@ function updateClipboard(text) {
 function switchEditSave(content, button) {
     content.contentEditable = !JSON.parse(content.contentEditable);
     button.textContent = JSON.parse(content.contentEditable) ? 'Save' : 'Edit';
+}
+
+function setActiveTab(tabNode) {
+    const activeTabId = +Array.from(tabNode.classList).find(className => className.startsWith('#')).slice(1) || 0;
+
+    tabButtons.forEach(button => button.classList.remove('tab_active'));
+    tabNode.classList.add('tab_active');
+
+    const allListsParent = document.querySelector('.content-wrapper');
+    [].forEach.call(allListsParent.children, list => list.classList.remove('content_active'));
+    allListsParent.children[activeTabId].classList.add('content_active');
 }
